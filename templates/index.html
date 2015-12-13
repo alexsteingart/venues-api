@@ -11,14 +11,23 @@
         height: auto;
         max-width: none;
       }
+
+      #sources {
+        position: fixed;
+        padding: 10px;
+        background-color: white;
+        top: 0px;
+      }
     </style>
     <title>Venues</title>
   </head>
   <body>
     <div id="map"></div>
+    <div id='sources' ></div>
     <script type="text/javascript">
 
 var map;
+var markers = {};
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 40.7127, lng: -74.0059},
@@ -30,25 +39,52 @@ function initMap() {
       venue = $.parseJSON(venue)
       var marker = new google.maps.Marker({
         position: new google.maps.LatLng(venue.lat, venue.lng),
-        map: map,
         title: venue.name
       });
 
       addInfoWindow(marker, venue);
 
-
-
+      var arr = markers[venue.source] || []
+      arr.push(marker)
+      markers[venue.source] = arr
     })
+    sourceDiv = $('#sources')
+    _.each(markers, function(mkrs, src){
+      var dv = document.createElement('div');
+      var lbl = document.createElement('label');
+      var txt = document.createTextNode( src + ' (' + mkrs.length + ')');
+      var chk = document.createElement('input')
+      chk.type = 'checkbox'
+      chk.value = src
+      chk.addEventListener('change', toggleMarkers);
+
+      lbl.appendChild(txt);
+      lbl.appendChild(chk);
+      dv.appendChild(lbl);
+      sourceDiv.append(dv);
+    })
+
+    sourceDiv.css({ left: (window.innerWidth/2 - sourceDiv.outerWidth()/2) + 'px'})
+
   }, 'json')
 
-  function addInfoWindow(marker, venue){
-    var infowindow = new google.maps.InfoWindow({
-       content: "<h2>" + venue.name + "</h2><p>" + venue.description.replace(". None", "") + "</p>"
-     });
-    google.maps.event.addListener(marker, 'click', function(){
-      infowindow.open(map, marker)
-    })
-  }
+}
+function addInfoWindow(marker, venue){
+  var infowindow = new google.maps.InfoWindow({
+     content: "<h2>" + venue.name + "</h2><p>" + venue.description.replace(". None", "") + "</p>" +
+        "source: <a href='" + venue.source_url + "' >" + venue.source + "</a>"
+   });
+  google.maps.event.addListener(marker, 'click', function(){
+    infowindow.open(map, marker)
+  })
+}
+
+function toggleMarkers(evt){
+  var src = evt.target.value;
+  var mapToSet = evt.target.checked ? map : null
+  _.each(markers[src], function(marker){
+    marker.setMap(mapToSet)
+  });
 }
 
     </script>
