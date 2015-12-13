@@ -87,7 +87,8 @@ function initMap() {
 function addInfoWindow(marker, venue){
   var description = _.isArray(venue.description) ? venue.description[0] : venue.description
   var infowindow = new google.maps.InfoWindow({
-     content: "<h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>"
+     content: "<h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>" +
+        "<a href='" + venue.source_url + "' >" + venue.source + "</a>"
    });
   google.maps.event.addListener(marker, 'click', function(){
     infowindow.open(map, marker)
