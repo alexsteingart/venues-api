@@ -3,7 +3,7 @@ from flask.ext.pymongo import PyMongo
 from bson import json_util
 
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 
 app.config.update(MONGO_DBNAME = 'items')
 mongo = PyMongo(app)

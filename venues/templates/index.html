@@ -69,15 +69,17 @@ function initMap() {
   }, 'json')
 
 }
+
 function addInfoWindow(marker, venue){
+  var description = _.isArray(venue.description) ? venue.description[0] : venue.description
   var infowindow = new google.maps.InfoWindow({
-     content: "<h2>" + venue.name + "</h2><p>" + venue.description.replace(". None", "") + "</p>" +
-        "source: <a href='" + venue.source_url + "' >" + venue.source + "</a>"
+     content: "<h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>"
    });
   google.maps.event.addListener(marker, 'click', function(){
     infowindow.open(map, marker)
   })
 }
+
 
 function toggleMarkers(evt){
   var src = evt.target.value;
