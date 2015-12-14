@@ -18,6 +18,7 @@
         padding: 10px;
         background-color: white;
         top: 0px;
+        overflow: auto;
       }
     </style>
     <title>Venues</title>
@@ -90,7 +91,7 @@ function initMap() {
       dv.appendChild(lbl);
 
       if(_.keys(hsh).length > 1){
-        
+
         _.each(hsh, function(arr, title){
           var dv2 = document.createElement('div');
           lbl = document.createElement('label');
@@ -111,8 +112,6 @@ function initMap() {
 
       sourceDiv.append(dv);
     })
-
-    sourceDiv.css({ left: (window.innerWidth/2 - sourceDiv.outerWidth()/2) + 'px'})
 
   }, 'json')
 
@@ -165,12 +164,15 @@ function toggleSubmarkers(evt){
 function toggleSources(evt){
   evt.preventDefault()
   dv = $('#sources')[0]
+  dvparent = $('#sources-parent')[0]
   if(dv.style.display == 'none'){
     dv.style.display = ''
+    dvparent.style.bottom = 0
     evt.target.innerText = 'Hide'
   }else{
     dv.style.display = 'none';
     evt.target.innerText = 'Show'
+    dvparent.style.bottom = null;
   }
 }
 
