@@ -113,6 +113,10 @@ function initMap() {
       sourceDiv.append(dv);
     })
 
+    inp = $(sourceDiv).find('input')[0]
+    inp.checked = true
+    setMarkers(true, inp.value, inp)
+
   }, 'json')
 
 }
@@ -171,7 +175,7 @@ function toggleSources(evt){
     evt.target.innerText = 'Hide'
   }else{
     dv.style.display = 'none';
-    evt.target.innerText = 'Show'
+    evt.target.innerText = 'Sources'
     dvparent.style.bottom = null;
   }
 }
