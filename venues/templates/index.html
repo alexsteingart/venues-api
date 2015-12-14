@@ -13,7 +13,7 @@
         max-width: none;
       }
 
-      #sources {
+      #sources-parent {
         position: fixed;
         padding: 10px;
         background-color: white;
@@ -24,12 +24,17 @@
   </head>
   <body>
     <div id="map"></div>
-    <div id='sources' ></div>
+    <div id='sources-parent' >
+      <a style='float:right;' href='#' >Sources</a>
+      <div id='sources' style='display:none;' ></div>
+    </div>
     <script type="text/javascript">
 
 var map;
 var markers = {};
 function initMap() {
+  $('#sources-parent a').on('click', toggleSources)
+
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 40.7127, lng: -74.0059},
     zoom: 14
@@ -59,15 +64,22 @@ function initMap() {
 
       addInfoWindow(marker, venue);
 
-      var arr = markers[venue.source] || []
+      var hsh = markers[venue.source] || {}
+      key = venue.source_title || 'all'
+      arr = hsh[key] || []
       arr.push(marker)
-      markers[venue.source] = arr
+      hsh[key] = arr
+      markers[venue.source] = hsh
     })
     sourceDiv = $('#sources')
-    _.each(markers, function(mkrs, src){
+    _.each(markers, function(hsh, src){
       var dv = document.createElement('div');
       var lbl = document.createElement('label');
-      var txt = document.createTextNode( src + ' (' + mkrs.length + ')');
+
+      length = _.reduce(hsh, function(memo, arr){
+        return memo + arr.length
+      }, 0)
+      var txt = document.createTextNode( src + ' (' + length + ')');
       var chk = document.createElement('input')
       chk.type = 'checkbox'
       chk.value = src
@@ -76,6 +88,34 @@ function initMap() {
       lbl.appendChild(txt);
       lbl.appendChild(chk);
       dv.appendChild(lbl);
+
+      if(_.keys(hsh).length > 1){
+        var noneLink = document.createElement('a')
+        noneLink.href='#'
+        noneLink.addEventListener('click', turnOffMarkers)
+        noneLink.dataset.parentSource = src
+        txt = document.createTextNode('none')
+        noneLink.appendChild(txt)
+        lbl.appendChild(noneLink)
+
+        _.each(hsh, function(arr, title){
+          var dv2 = document.createElement('div');
+          lbl = document.createElement('label');
+          lbl.style['margin-left'] = '5px';
+          txt = document.createTextNode(title + ' (' + arr.length + ')');
+          chk = document.createElement('input')
+          chk.type = 'checkbox'
+          chk.value = title
+          chk.dataset.parentSource = src
+          chk.addEventListener('change', toggleSubmarkers)
+
+          lbl.appendChild(txt);
+          lbl.appendChild(chk);
+          dv2.appendChild(lbl);
+          dv.appendChild(dv2);
+        })
+      }
+
       sourceDiv.append(dv);
     })
 
@@ -98,11 +138,40 @@ function addInfoWindow(marker, venue){
 
 
 function toggleMarkers(evt){
-  var src = evt.target.value;
-  var mapToSet = evt.target.checked ? map : null
-  _.each(markers[src], function(marker){
-    marker.setMap(mapToSet)
+  setMarkers(evt.target.checked, evt.target.value, evt.target)
+}
+
+function turnOffMarkers(evt){
+  evt.preventDefault
+  setMarkers(false, evt.target.dataset.parentSource, evt.target)
+}
+
+function setMarkers(checked, src, target){
+  var mapToSet = checked ? map : null
+  _.each(markers[src], function(arr){
+    _.each(arr, function(marker){
+      marker.setMap(mapToSet)
+    })
   });
+  children = $(target.parentElement.parentElement).find('div').find('input')
+  _.each(children, function(inp){
+    inp.checked = checked
+  })
+}
+
+function toggleSubmarkers(evt){
+  var src = evt.target.dataset.parentSource
+  var title = evt.target.value;
+  var mapToSet = evt.target.checked ? map : null
+  _.each(markers[src][title], function(marker){
+    marker.setMap(mapToSet)
+  })
+
+}
+
+function toggleSources(evt){
+  evt.preventDefault()
+  $('#sources').toggle()
 }
 
     </script>
