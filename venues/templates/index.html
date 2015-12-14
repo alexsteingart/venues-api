@@ -91,7 +91,16 @@ function initMap() {
       dv.appendChild(lbl);
 
       if(_.keys(hsh).length > 1){
+        var plus = document.createElement('a')
+        plus.href = '#'
+        txt = document.createTextNode('+')
+        plus.appendChild(txt)
+        plus.addEventListener('click', toggleSubmarkersDisplay)
+        dv.appendChild(plus)
 
+        var dv2parent = document.createElement('div')
+        dv2parent.style.display = 'none'
+        dv.appendChild(dv2parent)
         _.each(hsh, function(arr, title){
           var dv2 = document.createElement('div');
           lbl = document.createElement('label');
@@ -106,7 +115,7 @@ function initMap() {
           lbl.appendChild(txt);
           lbl.appendChild(chk);
           dv2.appendChild(lbl);
-          dv.appendChild(dv2);
+          dv2parent.appendChild(dv2);
         })
       }
 
@@ -178,6 +187,11 @@ function toggleSources(evt){
     evt.target.innerText = 'Sources'
     dvparent.style.bottom = null;
   }
+}
+
+function toggleSubmarkersDisplay(evt){
+  $(evt.target.nextSibling).toggle()
+  evt.target.innerText = evt.target.innerText == '+' ? '-' : '+'
 }
 
     </script>
