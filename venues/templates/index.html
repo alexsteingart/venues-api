@@ -90,14 +90,7 @@ function initMap() {
       dv.appendChild(lbl);
 
       if(_.keys(hsh).length > 1){
-        var noneLink = document.createElement('a')
-        noneLink.href='#'
-        noneLink.addEventListener('click', turnOffMarkers)
-        noneLink.dataset.parentSource = src
-        txt = document.createTextNode('none')
-        noneLink.appendChild(txt)
-        lbl.appendChild(noneLink)
-
+        
         _.each(hsh, function(arr, title){
           var dv2 = document.createElement('div');
           lbl = document.createElement('label');
