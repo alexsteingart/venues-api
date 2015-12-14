@@ -171,7 +171,14 @@ function toggleSubmarkers(evt){
 
 function toggleSources(evt){
   evt.preventDefault()
-  $('#sources').toggle()
+  dv = $('#sources')[0]
+  if(dv.style.display == 'none'){
+    dv.style.display = ''
+    evt.target.innerText = 'Hide'
+  }else{
+    dv.style.display = 'none';
+    evt.target.innerText = 'Show'
+  }
 }
 
     </script>
