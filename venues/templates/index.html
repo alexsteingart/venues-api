@@ -20,6 +20,13 @@
         background-color: white;
         top: 0px;
         overflow: auto;
+        z-index: 100;
+      }
+      #close-all {
+        position: fixed;
+        bottom: 0px;
+        background-color: white;
+        padding: 10px;
       }
 
       .selected {
@@ -35,6 +42,9 @@
     <div id='sources-parent' >
       <a style='float:right;' href='#' >Sources</a>
       <div id='sources' style='display:none;' ></div>
+    </div>
+    <div id='close-all' >
+      <a href='#'>Close all</a>
     </div>
     <script type="text/javascript">
 
@@ -149,10 +159,7 @@ function initMap() {
     if(evt.keyCode == 27 && !_.isEmpty(opened)){
       // 27 == ESC
       if(allSelected){
-        while(opened.length){
-          var infowindow = opened.pop()
-          infowindow.close()
-        }
+        closeAllInfoWindows();
         allSelected = false
         $('.selected').removeClass('selected')
       } else {
@@ -167,6 +174,18 @@ function initMap() {
     }
 
   })
+
+  $('#close-all a').click(function(evt){
+    evt.preventDefault();
+    closeAllInfoWindows();
+  })
+}
+
+function closeAllInfoWindows(){
+  while(opened.length){
+    var infowindow = opened.pop()
+    infowindow.close()
+  }
 }
 
 function addInfoWindow(marker, venue){
