@@ -20,6 +20,12 @@
         top: 0px;
         overflow: auto;
       }
+
+      .selected {
+        border: 3px solid #66c394;
+        margin-top: -3px;
+        margin-left: -3px;
+      }
     </style>
     <title>Venues</title>
   </head>
@@ -33,6 +39,8 @@
 
 var map;
 var markers = {};
+var opened = [];
+var allSelected = true;
 function initMap() {
   $('#sources-parent a').on('click', toggleSources)
 
@@ -41,7 +49,7 @@ function initMap() {
     zoom: 14
   });
 
-  if(navigator.geolocation){
+  /*if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(function(position) {
       var pos = {
         lat: position.coords.latitude,
@@ -53,7 +61,7 @@ function initMap() {
     }, function() {
 
     });
-  }
+  }*/
 
   $.get('/venues', {}, function(data, status, xhr){
     _.each(data.venues, function(venue){
@@ -128,16 +136,39 @@ function initMap() {
 
   }, 'json')
 
+  document.addEventListener('keydown', function(evt){
+    if(evt.keyCode == 27 && !_.isEmpty(opened)){
+      // 27 == ESC
+      if(allSelected){
+        while(opened.length){
+          var infowindow = opened.pop()
+          infowindow.close()
+        }
+        allSelected = false
+        $('.selected').removeClass('selected')
+      } else {
+        var infowindow = opened.pop()
+        infowindow.close()
+      }
+    } else if ((evt.keyCode == 97 || evt.keyCode == 65) && (evt.metaKey || evt.ctrlKey)){
+      // 97 == A
+      allSelected = true
+      $('.venue-infowindow').parent().parent().parent().parent().addClass('selected')
+      evt.preventDefault()
+    }
+
+  })
 }
 
 function addInfoWindow(marker, venue){
   var description = _.isArray(venue.description) ? venue.description[0] : venue.description
   var infowindow = new google.maps.InfoWindow({
-     content: "<h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>" +
-        "<a href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a>"
+     content: "<div class='venue-infowindow' ><h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>" +
+        "<a href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a></div>"
    });
   google.maps.event.addListener(marker, 'click', function(){
     infowindow.open(map, marker)
+    opened.push(infowindow)
   })
 }
 
