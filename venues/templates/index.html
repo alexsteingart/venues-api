@@ -62,7 +62,9 @@ function initMap() {
     zoom: 14
   });
 
-  if(navigator.geolocation){
+  if(window.location.search){
+    recenterMapFromParams()
+  }else if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(function(position) {
       lat = position.coords.latitude
       long = position.coords.longitude
@@ -179,6 +181,18 @@ function initMap() {
     evt.preventDefault();
     closeAllInfoWindows();
   })
+
+  google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
+     if(history){
+       queryString = 'lat=' + map.getCenter().lat() + '&lng=' + map.getCenter().lng() + '&zoom=' + map.getZoom()
+       if (window.location.search != ('?' + queryString)){
+         var url = window.location.href.substring(0, window.location.href.indexOf('?')) + '?' + queryString
+         history.pushState({}, 'Venues', url)
+       }
+     }
+  }, 500));
+
+  window.onpopstate = recenterMapFromParams
 }
 
 function closeAllInfoWindows(){
@@ -193,7 +207,7 @@ function addInfoWindow(marker, venue){
   var infowindow = new google.maps.InfoWindow({
      content: "<div class='venue-infowindow' ><h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>" +
         (venue.cuisine ? "<p>cuisine: " + venue.cuisine.join(', ') + "</p>" : '') +
-        "<a target='_blank' href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a></div>"
+        "<a href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a></div>"
    });
   google.maps.event.addListener(marker, 'click', function(){
     infowindow.open(map, marker)
@@ -253,6 +267,27 @@ function toggleSubmarkersDisplay(evt){
   $(evt.target.nextSibling).toggle()
   evt.target.innerText = evt.target.innerText == '+' ? '-' : '+'
 }
+
+function recenterMapFromParams(){
+  var params = parseQueryString()
+  map.setCenter({
+    lat: parseFloat(params.lat),
+    lng: parseFloat(params.lng)
+  })
+  map.setZoom(parseFloat(params.zoom))
+}
+var parseQueryString = function() {
+  var params = {}, queries, temp, i, l, queryString;
+  queryString = window.location.search.substring(1)
+  // Split into key/value pairs
+  queries = queryString.split("&");
+  // Convert the array of strings into an object
+  for ( i = 0, l = queries.length; i < l; i++ ) {
+    temp = queries[i].split('=');
+    params[temp[0]] = temp[1];
+  }
+  return params;
+};
 
     </script>
     <script async defer
