@@ -192,7 +192,8 @@ function addInfoWindow(marker, venue){
   var description = _.isArray(venue.description) ? venue.description[0] : venue.description
   var infowindow = new google.maps.InfoWindow({
      content: "<div class='venue-infowindow' ><h2>" + venue.name + "</h2><p>" + (description ? description.replace(". None", "") : '') + "</p>" +
-        "<a href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a></div>"
+        (venue.cuisine ? "<p>cuisine: " + venue.cuisine.join(', ') + "</p>" : '') +
+        "<a target='_blank' href='" + venue.source_url + "' >" + (venue.source_title || venue.source) + "</a></div>"
    });
   google.maps.event.addListener(marker, 'click', function(){
     infowindow.open(map, marker)
