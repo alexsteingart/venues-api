@@ -67,7 +67,7 @@ function initMap() {
       lat = position.coords.latitude
       long = position.coords.longitude
 
-      if(Math.abs(lat - baseLat) < .1 && Math.abs(long - baseLong) < .1){
+      if(Math.abs(lat - baseLat) < .15 && Math.abs(long - baseLong) < .15){
         // .1 is about 5 miles
         var pos = {
           lat: lat,
